@@ -15,8 +15,8 @@ public class ApplicationConfig {
     public static final int UDP_SEND_PORT = 3087;
     public static final int TCP_DEPLOY_PORT = 3088;
     public static final String SERVER_CAST_ADDRESS = "224.10.10.15";
-    public static final int SERVER_BROAD_CAST_PORT = 3086;
-    public static final int SERVER_MULTI_CAST_PORT = 3086;
+    public static final int SERVER_BROAD_CAST_PORT = 3090;
+    public static final int SERVER_MULTI_CAST_PORT = 3090;
 
     // 设备在线心跳检测间隔
     public static final long HEART_BEAT_CHECK_TIME = 1000 * 5;
