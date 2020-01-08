@@ -26,6 +26,7 @@ public class ServerCastUtils {
     private static void sendMessageByMulticast(InterfaceAddress interfaceAddress, String message) throws IOException {
         InetAddress inetAddress = InetAddress.getByName(ApplicationConfig.SERVER_CAST_ADDRESS);
         MulticastSocket multicastSocket = new MulticastSocket(new InetSocketAddress(interfaceAddress.getAddress(), ApplicationConfig.SERVER_MULTI_CAST_PORT));
+        multicastSocket.setTimeToLive(128);
         multicastSocket.setLoopbackMode(true);
         multicastSocket.joinGroup(inetAddress);
         DatagramPacket datagramPacket = new DatagramPacket(message.getBytes(), message.length(), inetAddress, ApplicationConfig.SERVER_MULTI_CAST_PORT);

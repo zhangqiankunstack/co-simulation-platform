@@ -1,16 +1,20 @@
 package com.rengu.cosimulation.service;
 
-import com.rengu.cosimulation.entity.*;
+import com.rengu.cosimulation.entity.ProcessNode;
+import com.rengu.cosimulation.entity.Project;
+import com.rengu.cosimulation.entity.Users;
 import com.rengu.cosimulation.enums.ResultCode;
 import com.rengu.cosimulation.exception.ResultException;
-import com.rengu.cosimulation.repository.*;
+import com.rengu.cosimulation.repository.ProcessNodeRepository1;
+import com.rengu.cosimulation.repository.ProjectRepository;
 import com.rengu.cosimulation.utils.ApplicationConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Author: XYmar
@@ -126,8 +130,8 @@ public class ProjectService {
 
     // 根据项目id查询项目
     public Project getProjectById(String projectId) {
-        if(!hasProjectById(projectId)){
-            throw new ResultException(ResultCode.PROJECT_ID_NOT_FOUND_ERROR);
+        if (!hasProjectById(projectId)) {            //根据项目id查询项目是否存在
+            throw new ResultException(ResultCode.PROJECT_ID_NOT_FOUND_ERROR);//未发现该项目ID
         }
         return projectRepository.findById(projectId).get();
     }

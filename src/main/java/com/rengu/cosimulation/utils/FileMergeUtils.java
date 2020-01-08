@@ -30,10 +30,10 @@ public class FileMergeUtils {
         blockFile.createNewFile();
         for (int i = start; i <= end; i++) {
             File chunkFile = new File(ApplicationConfig.CHUNKS_SAVE_PATH + java.io.File.separator + chunk.getIdentifier() + java.io.File.separator + i + ".tmp");
-            if (chunkFile.exists()) {
-                FileUtils.writeByteArrayToFile(blockFile, FileUtils.readFileToByteArray(chunkFile), true);
+            if (chunkFile.exists()) {           //文件是否存在
+                FileUtils.writeByteArrayToFile(blockFile, FileUtils.readFileToByteArray(chunkFile), true);//这样就可以快捷的实现文件上传啦
             } else {
-                throw new ResultException(ResultCode.FILE_CHUNK_NOT_FOUND_ERROR);
+                throw new ResultException(ResultCode.FILE_CHUNK_NOT_FOUND_ERROR);   //文件块不存在或不合法
             }
         }
         log.info(chunk.getFilename() + "多线程合并，start：" + start + ",end:" + end + "结束,耗时：" + (System.currentTimeMillis() - startTime) + ",开始时间：" + startTime);

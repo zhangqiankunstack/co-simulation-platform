@@ -46,7 +46,8 @@ public class SublibraryService {
     // 根据id查询子库
     public SubDepot getSublibraryById(String id){
         if(!hasSublibraryById(id)){
-            throw new ResultException(ResultCode.SUBLIBRARY_ID_NOT_FOUND_ERROR);
+            // throw new ResultException(ResultCode.SUBLIBRARY_ID_NOT_FOUND_ERROR);
+            return null;
         }
         return subLibraryRepository.findById(id).get();
     }

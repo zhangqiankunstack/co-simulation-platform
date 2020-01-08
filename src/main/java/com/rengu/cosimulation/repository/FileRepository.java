@@ -8,7 +8,9 @@ import java.util.Optional;
 
 @Repository
 public interface FileRepository extends JpaRepository<Files, String> {
+    //根据MD5值判断文件是否存在
     boolean existsByMD5(String md5);
 
+    //根据MD5值查询文件
     Optional<Files> findByMD5(String md5);
 }

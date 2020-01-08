@@ -5,19 +5,13 @@ import com.rengu.cosimulation.enums.ResultCode;
 import com.rengu.cosimulation.exception.ResultException;
 import com.rengu.cosimulation.repository.*;
 import com.rengu.cosimulation.utils.ExcelUtils;
-import com.rengu.cosimulation.utils.FileUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.poi.hssf.usermodel.HSSFRow;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.context.annotation.Bean;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -26,9 +20,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.*;
-import java.util.regex.Pattern;
 
 /**
  * Author: XYmar
@@ -98,7 +92,7 @@ public class UserService implements UserDetailsService {
 
     // 导入用户
     public List<Users> importUser(String type, MultipartFile multipartFile) throws Exception {
-        File tempFile = new File(FileUtils.getTempDirectoryPath() + "/" + multipartFile.getOriginalFilename());
+        File tempFile = new File(FileUtils.getTempDirectoryPath() + "/" + multipartFile.getOriginalFilename());// 获取上传文件的原名
         tempFile.getParentFile().mkdirs();          //得到Ecael文件名的父类，并建立整个父类目录
         tempFile.createNewFile();                   //然后创建一个新的文件
         IOUtils.copy(multipartFile.getInputStream(), new FileOutputStream(tempFile));//相当于一个文件可以复制到另一个文件中

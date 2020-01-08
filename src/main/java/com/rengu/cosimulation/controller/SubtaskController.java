@@ -33,38 +33,38 @@ public class SubtaskController {
 
     // 根据项目id查询子任务
     @GetMapping(value = "/byProject/{projectId}")
-    public Result findByProjectId(@PathVariable(value = "projectId") String projectId){
+    public Result findByProjectId(@PathVariable(value = "projectId") String projectId) {
         List<Subtask> subtaskList = subtaskService.findByProjectId(projectId);
         return ResultUtils.success(subtaskList);
     }
 
     // 根据id查询子任务
     @GetMapping(value = "/{subtaskId}")
-    public Result getSubtaskById(@PathVariable(value = "subtaskId") String subtaskId){
+    public Result getSubtaskById(@PathVariable(value = "subtaskId") String subtaskId) {
         return ResultUtils.success(subtaskService.getSubtaskById(subtaskId));
     }
 
     // 修改子任务(执行者，子任务，节点)
     @PatchMapping(value = "/{subtaskId}/byProject/{projectId}")
-    public Result updateSubtaskById(@PathVariable(value = "projectId") String projectId, @PathVariable(value = "subtaskId") String subtaskId, String loginUserId, String userId, String finishTime){
+    public Result updateSubtaskById(@PathVariable(value = "projectId") String projectId, @PathVariable(value = "subtaskId") String subtaskId, String loginUserId, String userId, String finishTime) {
         return ResultUtils.success(subtaskService.updateSubtaskById(projectId, subtaskId, loginUserId, userId, finishTime));
     }
 
     // 删除子任务
     @DeleteMapping(value = "/{subtaskId}")
-    public Result deleteSubtaskById(@PathVariable(value = "subtaskId") String subtaskId){
+    public Result deleteSubtaskById(@PathVariable(value = "subtaskId") String subtaskId) {
         return ResultUtils.success(subtaskService.deleteSubtaskById(subtaskId));
     }
 
     // 根据子任务id创建文件
     @PostMapping(value = "/{subtaskId}/uploadfiles")
-    public Result saveSubtaskFilesByProDesignId(@PathVariable(value = "subtaskId") String subtaskId, @RequestHeader(value = "projectId") String projectId, @RequestBody List<FileMeta> fileMetaList){
+    public Result saveSubtaskFilesByProDesignId(@PathVariable(value = "subtaskId") String subtaskId, @RequestHeader(value = "projectId") String projectId, @RequestBody List<FileMeta> fileMetaList) {
         return ResultUtils.success(subtaskFilesService.saveSubtaskFilesByProDesignId(subtaskId, projectId, fileMetaList));
     }
 
     // 根据文件属性判断重复文件
     @PostMapping(value = "/{subtaskId}/findExistSubtaskFiles")
-    public Result findExistSubtaskFiles(@PathVariable(value = "subtaskId") String subtaskId, @RequestBody List<FileMeta> fileMetaList){
+    public Result findExistSubtaskFiles(@PathVariable(value = "subtaskId") String subtaskId, @RequestBody List<FileMeta> fileMetaList) {
         return ResultUtils.success(subtaskFilesService.findExistSubtaskFiles(subtaskId, fileMetaList));
     }
 
@@ -100,7 +100,7 @@ public class SubtaskController {
 
     // 申请二次修改
     @PostMapping(value = "/{subtaskId}/applyForModify")
-    public Result applyForModify(@PathVariable(value = "subtaskId") String subtaskId, String version){
+    public Result applyForModify(@PathVariable(value = "subtaskId") String subtaskId, String version) {
         return ResultUtils.success(subtaskService.applyForModify(subtaskId, version));
     }
 
@@ -112,25 +112,25 @@ public class SubtaskController {
 
     // 项目负责人处理二次修改申请
     @PostMapping(value = "/{subtaskId}/handleModifyApply")
-    public Result handleModifyApply(@PathVariable(value = "subtaskId") String subtaskId, boolean ifModifyApprove){
+    public Result handleModifyApply(@PathVariable(value = "subtaskId") String subtaskId, boolean ifModifyApprove) {
         return ResultUtils.success(subtaskService.handleModifyApply(subtaskId, ifModifyApprove));
     }
 
     // 根据用户查询所有项目
     @GetMapping(value = "/findProjectsByUserId/{userId}")
-    public Result findProjectsByUserId(@PathVariable(value = "userId") String userId){
+    public Result findProjectsByUserId(@PathVariable(value = "userId") String userId) {
         return ResultUtils.success(subtaskService.findProjectsByUserId(userService.getUserById(userId)));
     }
 
     // 返回整个系统的所有项目及以下子任务的树结构
     @GetMapping(value = "/getProjectTrees")
-    public Result getProjectTrees(@RequestHeader(value = "userSecretClass") int userSecretClass){
+    public Result getProjectTrees(@RequestHeader(value = "userSecretClass") int userSecretClass) {
         return ResultUtils.success(subtaskService.getProjectTrees(userSecretClass));
     }
 
     // 查询用户是否是项目或子任务负责人
     @PostMapping("/ifIncharge")
-    public Result ifIncharge(String userId){
+    public Result ifIncharge(String userId) {
         return ResultUtils.success(subtaskService.ifIncharge(userId));
     }
 

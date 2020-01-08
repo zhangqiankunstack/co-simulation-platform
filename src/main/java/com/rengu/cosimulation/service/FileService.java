@@ -31,7 +31,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-
+//import static com.rengu.cosimulation.enums.ResultCode.FILE_MD5_EXISTED_ERROR;
 /**
  * Author: XYmar
  * Date: 2019/2/28 11:14
@@ -50,10 +50,10 @@ public class FileService {
 
     // 根据Md5判断文件是否存在
     public boolean hasFileByMD5(String MD5) {
-        if (StringUtils.isEmpty(MD5)) {
+        if (StringUtils.isEmpty(MD5)) {             //为空返回false
             return false;
         }
-        return fileRepository.existsByMD5(MD5);
+        return fileRepository.existsByMD5(MD5);             //通过MD5值是否存在true  or  false
     }
 
     // 保存文件块
@@ -136,15 +136,16 @@ public class FileService {
 
     // 合并文件块
     public Files mergeChunks(Chunk chunk) throws IOException, ExecutionException, InterruptedException {
-        if (hasFileByMD5(chunk.getIdentifier())) {
-            return getFileByMD5(chunk.getIdentifier());
+        if (hasFileByMD5(chunk.getIdentifier())) {                  //根据MD5值判断文件是否存在，如果存在
+            return getFileByMD5(chunk.getIdentifier());             //根据MD5值查询文件
         } else {
             java.io.File file = null;
-            String extension = FilenameUtils.getExtension(chunk.getFilename());
-            if (StringUtils.isEmpty(extension)) {
-                file = new java.io.File(ApplicationConfig.FILES_SAVE_PATH + java.io.File.separator + chunk.getIdentifier());
+            String extension = FilenameUtils.getExtension(chunk.getFilename());     //获取文件的扩展名
+            //System.out.println("扩展名"+extension);
+            if (StringUtils.isEmpty(extension)) {       //判断扩展名是否为空
+                file = new java.io.File(ApplicationConfig.FILES_SAVE_PATH + java.io.File.separator + chunk.getFilename());//如果文件为空，保存路径+MD5值
             } else {
-                file = new java.io.File(ApplicationConfig.FILES_SAVE_PATH + java.io.File.separator + chunk.getIdentifier() + "." + FilenameUtils.getExtension(chunk.getFilename()));
+                file = new java.io.File(ApplicationConfig.FILES_SAVE_PATH + java.io.File.separator + chunk.getFilename());//不为空+保存路径+文件扩展名
             }
             return mergeChunks(file, chunk);
         }
@@ -157,7 +158,7 @@ public class FileService {
         @Cleanup FileInputStream fileInputStream = new FileInputStream(file);
         String MD5 = DigestUtils.md5Hex(fileInputStream);
         if (hasFileByMD5(MD5)) {
-            throw new ResultException(ResultCode.FILE_MD5_EXISTED_ERROR);
+            throw new ResultException(ResultCode.FILE_MD5_EXISTED_ERROR);       //todo:该文件MD5值已经存在
         }
         filesEntity.setMD5(MD5);         // MD5
         filesEntity.setPostfix(FilenameUtils.getExtension(file.getName()));                // 后缀
@@ -167,13 +168,14 @@ public class FileService {
     }
 
     private Files mergeChunks(File file, Chunk chunkEntity) throws IOException, ExecutionException, InterruptedException {
-        long startTime = System.currentTimeMillis();
+        long startTime = System.currentTimeMillis();            //起始时间
         file.delete();
-        file.getParentFile().mkdirs();
-        file.createNewFile();
-        if (chunkEntity.getTotalChunks() >= switchNum) {
-            int last = chunkEntity.getTotalChunks() % concurrentNum;
-            int baseStep = (chunkEntity.getTotalChunks() - last) / concurrentNum;
+        file.getParentFile().mkdirs();                          //得到文件名的父类所有路径
+        file.createNewFile();                                   //创建一个新的文件
+        if (chunkEntity.getTotalChunks() >= switchNum) {             //todo:假如文件块数大于等于10
+            int last = chunkEntity.getTotalChunks() % concurrentNum;        //用户文件总块数除以10，得到余数
+            int baseStep = (chunkEntity.getTotalChunks() - last) / concurrentNum;          //计算每10兆一块，计算可以分几块shunks
+            System.out.println("余数=" + baseStep);
             int startPoint = 1;
             Map<Integer, CompletableFuture<File>> fileMap = new HashMap<>();
             for (int i = 1; i <= concurrentNum; i++) {
@@ -184,7 +186,7 @@ public class FileService {
                 fileMap.put(i, fileMergeUtils.megeChunks(startPoint, startPoint + step - 1, chunkEntity));
                 startPoint = startPoint + step;
             }
-            FileOutputStream fileOutputStream = FileUtils.openOutputStream(file, true);
+            FileOutputStream fileOutputStream = FileUtils.openOutputStream(file, true);             //开启连接输出流，可以发送内容
             for (int i = 1; i <= concurrentNum; i++) {
                 File block = fileMap.get(i).get();
                 if (block.exists()) {
@@ -192,7 +194,7 @@ public class FileService {
 //                    FileUtils.writeByteArrayToFile(file, FileUtils.readFileToByteArray(block), true);
                 } else {
                     IOUtils.closeQuietly(fileOutputStream);
-                    throw new ResultException(ResultCode.FILE_CHUNK_NOT_FOUND_ERROR);
+                    throw new ResultException(ResultCode.FILE_CHUNK_NOT_FOUND_ERROR);       //文件块不存在或不合法
                 }
             }
             IOUtils.closeQuietly(fileOutputStream);

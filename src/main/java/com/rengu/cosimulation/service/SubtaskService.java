@@ -70,8 +70,8 @@ public class SubtaskService {
 
     // 根据id查询子任务
     public Subtask getSubtaskById(String subtaskById) {
-        if (!hasSubtaskById(subtaskById)) {
-            throw new ResultException(ResultCode.SUBTASK_ID_NOT_FOUND_ERROR);
+        if (!hasSubtaskById(subtaskById)) {//根据id查询子任务是否存在
+            throw new ResultException(ResultCode.SUBTASK_ID_NOT_FOUND_ERROR);//未发现该子任务ID
         }
         return subtaskRepository.findById(subtaskById).get();
     }

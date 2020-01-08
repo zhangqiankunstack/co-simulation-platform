@@ -69,25 +69,27 @@ public class SubtaskFilesService {
     // 根据子任务id创建文件
     @CacheEvict(value = "SubtaskFiles_Cache", allEntries = true)
     public List<SubtaskFile> saveSubtaskFilesByProDesignId(String subtaskId, String projectId, List<FileMeta> fileMetaList) {
-        Project project = projectService.getProjectById(projectId);
-        Subtask subTask = subtaskService.getSubtaskById(subtaskId);
+        Project project = projectService.getProjectById(projectId);//todo：根据项目id查询项目是否存在
+        Subtask subTask = subtaskService.getSubtaskById(subtaskId);//todo：根据id查询子任务
         if(subTask.getState() != ApplicationConfig.SUBTASK_START && !subTask.isIfModifyApprove()){                   // 上传文件前判断子任务是否已在进行中  或者二次修改申请被同意
-            throw new ResultException(ResultCode.SUBTASK_HAVE_NOT_START);
+            throw new ResultException(ResultCode.SUBTASK_HAVE_NOT_START);  //此任务当前阶段无法执行上传操作
         }
         List<SubtaskFile> subtaskFileList = new ArrayList<>();
+
+
         for (FileMeta fileMeta : fileMetaList) {
-            String path = fileMeta.getRelativePath().split("/")[1];
+            //String path = fileMeta.getRelativePath().split("/")[1];         //相对路径
             if(fileMeta.getSecretClass() > project.getSecretClass()){  //文件密级只能低于等于该项目密级
-                throw new ResultException(ResultCode.SUBTASK_FILE_SECRETCLASS_NOT_SUPPORT_ERROR);
+                throw new ResultException(ResultCode.SUBTASK_FILE_SECRETCLASS_NOT_SUPPORT_ERROR);//子任务文件只能低于或等于项目密级
             }
 
-            if(StringUtils.isEmpty(fileMeta.getSublibraryId())){
-                throw new ResultException(ResultCode.SUBLIBRARY_NOT__APPOINT_ERROR);
+            if (StringUtils.isEmpty(fileMeta.getSublibraryId())) {//判断任务id是否为空
+                throw new ResultException(ResultCode.SUBLIBRARY_NOT__APPOINT_ERROR);//请指定库
             }
             SubDepot subDepot = sublibraryService.getSublibraryById(fileMeta.getSublibraryId());      // 子库
             // 上传文件，前端会先调用判断接口，此处无需判断
             SubtaskFile subtaskFile = new SubtaskFile();
-            subtaskFile.setName(StringUtils.isEmpty(FilenameUtils.getBaseName(fileMeta.getRelativePath())) ? "-" : FilenameUtils.getBaseName(fileMeta.getRelativePath()));
+            subtaskFile.setName(StringUtils.isEmpty(fileMeta.getName()) ? "-" : fileMeta.getName());
             subtaskFile.setPostfix(FilenameUtils.getExtension(fileMeta.getRelativePath()));
             subtaskFile.setType(fileMeta.getType());
             subtaskFile.setSecretClass(fileMeta.getSecretClass());
@@ -101,9 +103,12 @@ public class SubtaskFilesService {
             subtaskFile.setFiles(fileService.getFileById(fileMeta.getFileId()));
             subtaskFile.setSubtask(subTask);
             Set<SubDepot> sublibraryEntities = subtaskFile.getSubDepotSet() == null ? new HashSet<>() : subtaskFile.getSubDepotSet();
-            sublibraryEntities.add(subDepot);
+            if (subDepot != null) {
+                sublibraryEntities.add(subDepot);
+            }
             subtaskFile.setSubDepotSet(sublibraryEntities);
             subtaskFileList.add(subtaskFilesRepository.save(subtaskFile));
+
         }
         return subtaskFileList;
     }

@@ -27,4 +27,7 @@ public class Files implements Serializable {
     private int secretClass;              // 密级：  0：公开  1：内部  2：秘密  3：机密  4：绝密
     private long fileSize;
     private String localPath;
+
+    public Files() {
+    }
 }
